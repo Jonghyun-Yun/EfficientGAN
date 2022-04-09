@@ -1,6 +1,15 @@
+#from keras.models import Sequential, Model
+#from keras.layers import Input, Dense, LeakyReLU, Concatenate, Dropout
+#from keras.layers.normalization import BatchNormalization
+#from keras.optimizers import Adam
+
 import tensorflow as tf
+#from tensorflow.keras.models import Sequential
 from tensorflow.python.keras.layers import Input, Dense, LeakyReLU, Concatenate, Dropout
 from tensorflow.python.keras.models import Model
+from tensorflow.keras.layers import Input, Dense, LeakyReLU, Concatenate, Dropout
+#from tensorflow.keras import Model
+#from tensorflow.keras.optimizers import Adam
 from sklearn.preprocessing import minmax_scale
 import numpy as np
 
@@ -10,9 +19,8 @@ class EfficientGAN(object):
         self.latent_dim = int(latent_dim)
       
     #Train model
-    def fit(self, X_train, epochs=50, batch_size=50, loss=tf.keras.losses.BinaryCrossentropy(),
-            optimizer=tf.keras.optimizers.Adam(lr=1e-5, beta_1=0.5), test=tuple(), early_stop_num=50,
-            verbose=1):
+    def fit(self, X_train, epochs=50, batch_size=64, loss=tf.keras.losses.BinaryCrossentropy(),
+            optimizer=tf.keras.optimizers.Adam(learning_rate=1e-5, beta_1=0.5), test=tuple(), early_stop_num=50, verbose=1):
         
         #Convert training-data to numpy format
         X_train = np.array(X_train)
@@ -22,8 +30,8 @@ class EfficientGAN(object):
         
         #Define model for Discriminator
         self.dis = self.get_discriminator()
-        self.dis.compile(loss=loss, optimizer=optimizer)        
-        
+        self.dis.compile(loss=loss, optimizer=optimizer)
+      
         #Define model to train Encoder
         self.enc = self.get_encoder()
         x = Input(shape=(self.input_dim,))
@@ -97,7 +105,7 @@ class EfficientGAN(object):
                     stop_count += 1               
                     
             #Display learning progress
-            if verbose==1 and i%100==0:
+            if verbose==1 and i%10==0:
                 if len(test)==0: print(f'epoch{i}-> d_loss:{d_loss}  e_loss:{e_loss}  g_loss:{g_loss}')
                 else: print(f'epoch{i}-> d_loss:{d_loss}  e_loss:{e_loss}  g_loss:{g_loss}  val_loss:{val_loss}')
     
